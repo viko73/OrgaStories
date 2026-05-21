@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrgaStories — Ton espace créatif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/views.css">
+<link rel="stylesheet" href="css/pages.css">
+<link rel="stylesheet" href="css/modals.css">
+<link rel="stylesheet" href="css/auth.css">
+<link rel="icon" type="image/svg+xml" href="images/orgabook.png">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-name">OrgaStories</div>
+    <div class="brand-sub"><span class="status-dot"></span>Espace créatif</div>
+  </div>
+
+  <div class="sidebar-scroll">
+    <div class="nav-section">
+      <div class="nav-label">Navigation</div>
+      <button class="nav-item active" id="nav-home" onclick="showHome()">
+        <span class="nav-icon">◈</span> Accueil
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Espaces</div>
+      <div id="spaces-sidebar"></div>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-info" id="user-info">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <div class="user-details">
+        <div class="user-name" id="user-name">—</div>
+        <div class="user-email" id="user-email">—</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Déconnexion">⏻</button>
+    </div>
+    <button class="add-btn" onclick="openModalSpace()">+ Nouvel espace</button>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<main class="main">
+  <div class="topbar">
+    <div id="breadcrumb" class="page-breadcrumb">
+      <span>OrgaStories</span> / <span class="crumb-active">Accueil</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" title="Paramètres">⚙</button>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- ── HOME ── -->
+    <div class="view active" id="view-home">
+      <div class="home-hero">
+        <div class="home-greeting">// Bienvenue dans OrgaStories</div>
+        <h1 class="home-title">Donne vie à tes <em>idées</em></h1>
+        <p class="home-sub">Crée des espaces, puis peuple-les de notes, personnages et mondes selon tes projets.</p>
+      </div>
+      <div class="home-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-spaces">0</div>
+          <div class="stat-label">Espaces</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-notes" style="color:var(--cyan)">0</div>
+          <div class="stat-label">Notes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-chars" style="color:var(--purple)">0</div>
+          <div class="stat-label">Personnages</div>
+        </div>
+      </div>
+      <div class="home-recents">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div class="section-title" style="margin-bottom:0">Mes espaces</div>
+          <button class="new-page-btn" onclick="openModalSpace()">+ Nouvel espace</button>
+        </div>
+        <div class="recent-grid" id="spaces-grid"></div>
+      </div>
+      <div class="home-recents" style="padding-top:0">
+        <div class="section-title">Récemment modifié</div>
+        <div class="recent-grid" id="recent-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── SPACE HUB : 3 grandes tuiles ── -->
+    <div class="view" id="view-space">
+      <div class="space-view-wrap">
+        <div class="space-view-header">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div class="space-big-icon" id="space-view-icon">📚</div>
+            <div>
+              <h2 class="space-view-title" id="space-view-title">Espace</h2>
+              <div class="space-view-meta" id="space-view-meta"></div>
+            </div>
+          </div>
+          <button class="del-btn-danger" onclick="deleteCurrentContext()" title="Supprimer l'espace">🗑 Supprimer l'espace</button>
+        </div>
+        <div class="hub-tiles">
+          <div class="hub-tile note-tile" onclick="showCategoryView('note')">
+            <div class="hub-tile-icon">📝</div>
+            <div class="hub-tile-title">Notes</div>
+            <div class="hub-tile-sub">Idées, réflexions, brouillons</div>
+            <div class="hub-tile-count" id="hub-count-note">0 note</div>
+            <div class="hub-tile-arrow">→</div>
+          </div>
+          <div class="hub-tile char-tile" onclick="showCategoryView('character')">
+            <div class="hub-tile-icon">👤</div>
+            <div class="hub-tile-title">Personnages</div>
+            <div class="hub-tile-sub">Fiches, traits, backstory</div>
+            <div class="hub-tile-count" id="hub-count-character">0 personnage</div>
+            <div class="hub-tile-arrow">→</div>
+          </div>
+          <div class="hub-tile world-tile" onclick="showCategoryView('world')">
+            <div class="hub-tile-icon">🌍</div>
+            <div class="hub-tile-title">Mondes</div>
+            <div class="hub-tile-sub">Géographie, magie, sociétés</div>
+            <div class="hub-tile-count" id="hub-count-world">0 monde</div>
+            <div class="hub-tile-arrow">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CATEGORY LIST VIEW ── -->
+    <div class="view" id="view-category">
+      <div class="space-view-wrap">
+        <div class="space-view-header">
+          <div style="display:flex;align-items:center;gap:14px">
+            <button class="back-btn" id="cat-back-btn" onclick="">← Retour</button>
+            <div class="space-big-icon" id="cat-icon">📝</div>
+            <div>
+              <h2 class="space-view-title" id="cat-title">Notes</h2>
+              <div class="space-view-meta" id="cat-meta"></div>
+            </div>
+          </div>
+          <button class="cat-add-btn" id="cat-add-btn" onclick="">+ Nouveau</button>
+        </div>
+        <div class="cat-list-grid" id="cat-list-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── NOTE ── -->
+    <div class="view" id="view-note">
+      <div class="note-editor-wrap">
+        <div class="page-title-row">
+          <input class="note-title-input" id="note-title" placeholder="Titre de la note…">
+          <button class="page-del-btn" onclick="deleteCurrentContext()" title="Supprimer cette note">🗑 Supprimer</button>
+        </div>
+        <div class="note-meta">
+          <span class="note-meta-tag">Note</span>
+          <span class="note-meta-tag" id="note-space-label"></span>
+        </div>
+        <div class="toolbar">
+          <button class="toolbar-btn" title="Gras" onclick="formatDoc('bold')"><b>B</b></button>
+          <button class="toolbar-btn" title="Italique" onclick="formatDoc('italic')"><i>I</i></button>
+          <button class="toolbar-btn" title="Souligné" onclick="formatDoc('underline')"><u>S</u></button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="formatDoc('insertUnorderedList')">≡</button>
+          <button class="toolbar-btn" onclick="formatDoc('insertOrderedList')">①</button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="formatDoc('formatBlock','h2')">H2</button>
+          <button class="toolbar-btn" onclick="formatDoc('formatBlock','blockquote')">"</button>
+          <div class="toolbar-sep"></div>
+          <button class="toolbar-btn" onclick="formatDoc('removeFormat')">✕</button>
+        </div>
+        <div class="note-editor-lined">
+          <div class="note-line-numbers" id="note-line-numbers"></div>
+          <div class="note-body" id="note-body" contenteditable="true" spellcheck="true"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHARACTER ── -->
+    <div class="view" id="view-char">
+      <div class="char-wrap">
+        <div class="char-header">
+          <div class="char-avatar">
+            <span class="char-avatar-letter" id="char-initial">?</span>
+          </div>
+          <div class="char-info">
+            <div class="page-title-row">
+              <input class="char-name-input" id="char-name" placeholder="Nom du personnage…">
+              <button class="page-del-btn" onclick="deleteCurrentContext()" title="Supprimer ce personnage">🗑 Supprimer</button>
+            </div>
+            <input class="char-role-input" id="char-role" placeholder="Rôle / Titre…">
+          </div>
+        </div>
+        <div class="char-grid">
+          <div class="char-field">
+            <div class="char-field-label">Âge & Origine</div>
+            <textarea class="char-field-input" id="char-age" rows="2" placeholder="Ex: 28 ans, née à…"></textarea>
+          </div>
+          <div class="char-field">
+            <div class="char-field-label">Apparence</div>
+            <textarea class="char-field-input" id="char-appearance" rows="2" placeholder="Description physique…"></textarea>
+          </div>
+          <div class="char-field full">
+            <div class="char-field-label">Personnalité</div>
+            <textarea class="char-field-input" id="char-personality" rows="3" placeholder="Caractère, comportements, façon d'être…"></textarea>
+          </div>
+          <div class="char-field full">
+            <div class="char-field-label">Backstory & Notes</div>
+            <textarea class="char-field-input" id="char-backstory" rows="5" placeholder="Histoire, anecdotes…"></textarea>
+          </div>
+        </div>
+        <div class="char-relations">
+          <div class="char-field-label">Relations</div>
+          <div class="relations-list" id="relations-list"></div>
+          <button class="relation-add-btn" onclick="addRelation()">＋ Ajouter une relation</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WORLD ── -->
+    <div class="view" id="view-world">
+      <div class="world-wrap">
+        <div class="world-header">
+          <div class="page-title-row">
+            <input class="world-name-input" id="world-name" placeholder="Nom du monde…">
+            <button class="page-del-btn" onclick="deleteCurrentContext()" title="Supprimer ce monde">🗑 Supprimer</button>
+          </div>
+          <input class="world-type-input" id="world-type" placeholder="Genre / Type de monde…">
+        </div>
+        <div class="world-map">
+          <div class="world-map-icon">🗺</div>
+          <div class="world-map-hint">Clique pour ajouter une carte ou une image</div>
+        </div>
+        <div class="world-cards">
+          <div class="world-card full">
+            <div class="world-card-label">Description générale</div>
+            <textarea class="world-card-input" id="world-description" rows="3" placeholder="Décris ce monde…"></textarea>
+          </div>
+          <div class="world-card">
+            <div class="world-card-label">Géographie</div>
+            <textarea class="world-card-input" id="world-geography" rows="4" placeholder="Régions, lieux, topographie…"></textarea>
+          </div>
+          <div class="world-card">
+            <div class="world-card-label">Magie / Technologie</div>
+            <textarea class="world-card-input" id="world-magic" rows="4" placeholder="Comment fonctionne ce monde…"></textarea>
+          </div>
+          <div class="world-card">
+            <div class="world-card-label">Société & Politique</div>
+            <textarea class="world-card-input" id="world-society" rows="4" placeholder="Factions, gouvernement, culture…"></textarea>
+          </div>
+          <div class="world-card">
+            <div class="world-card-label">Histoire & Mythologie</div>
+            <textarea class="world-card-input" id="world-history" rows="4" placeholder="Événements passés, légendes…"></textarea>
+          </div>
+          <div class="world-card full">
+            <div class="world-card-label">Notes & Idées libres</div>
+            <textarea class="world-card-input" id="world-notes" rows="3" placeholder="Questions ouvertes, idées en vrac…"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</main>
+
+<!-- ══════════════════════════════════════════
+     MODAL : NOUVEL ESPACE
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-space">
+  <div class="modal narrow">
+    <div class="modal-title">Nouvel espace</div>
+    <div class="modal-sub">Un espace regroupe tes notes, personnages et mondes d'un même projet.</div>
+    <div class="modal-label">Icône</div>
+    <input class="modal-input" id="space-icon-input" placeholder="📁" maxlength="2" style="font-size:22px;text-align:center">
+    <div class="modal-label">Nom de l'espace</div>
+    <input class="modal-input" id="space-name-input" placeholder="Ex: Mon roman, Campagne JDR…"
+           onkeydown="if(event.key==='Enter') createSpace()">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-space')">Annuler</button>
+      <button class="btn-create" onclick="createSpace()">Créer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL : NOUVELLE PAGE
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-page">
+  <div class="modal">
+    <div class="modal-title">Nouvelle page</div>
+    <div class="modal-sub">Choisis le type de page à ajouter dans cet espace.</div>
+    <div class="modal-options">
+      <div class="modal-opt note selected-note" onclick="selectPageType('note', this)">
+        <div class="modal-opt-icon">📝</div>
+        <div class="modal-opt-label">Note</div>
+      </div>
+      <div class="modal-opt character" onclick="selectPageType('character', this)">
+        <div class="modal-opt-icon">👤</div>
+        <div class="modal-opt-label">Personnage</div>
+      </div>
+      <div class="modal-opt world" onclick="selectPageType('world', this)">
+        <div class="modal-opt-icon">🌍</div>
+        <div class="modal-opt-label">Monde</div>
+      </div>
+    </div>
+    <div class="modal-label">Titre de la page</div>
+    <input class="modal-input" id="page-name-input" placeholder="Donne un nom à cette page…"
+           onkeydown="if(event.key==='Enter') createPage()">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-page')">Annuler</button>
+      <button class="btn-create" onclick="createPage()">Créer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ÉCRAN DE CONNEXION
+══════════════════════════════════════════ -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">OrgaStories</div>
+    <div class="auth-tagline">Ton espace créatif</div>
+
+    <!-- Onglets -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Créer un compte</button>
+    </div>
+
+    <!-- Formulaire connexion -->
+    <div id="form-login">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="login-email" type="email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter') login()">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Mot de passe</label>
+        <input class="auth-input" id="login-password" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button class="auth-btn" onclick="login()">Se connecter →</button>
+    </div>
+
+    <!-- Formulaire inscription -->
+    <div id="form-register" style="display:none">
+      <div class="auth-field">
+        <label class="auth-label">Prénom</label>
+        <input class="auth-input" id="reg-name" type="text" placeholder="Ton prénom" onkeydown="if(event.key==='Enter') register()">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input class="auth-input" id="reg-email" type="email" placeholder="ton@email.com" onkeydown="if(event.key==='Enter') register()">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Mot de passe</label>
+        <input class="auth-input" id="reg-password" type="password" placeholder="8 caractères minimum" onkeydown="if(event.key==='Enter') register()">
+      </div>
+      <div class="auth-error" id="reg-error"></div>
+      <button class="auth-btn" onclick="register()">Créer mon compte →</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/auth.js"></script>
+<script src="js/state.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/views.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/modals.js"></script>
+</body>
+</html>
