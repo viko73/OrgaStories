@@ -64,7 +64,7 @@ function renderSpacesGrid() {
   };
 
   grid.innerHTML = state.spaces.map(s => `
-    <div class="recent-card note" style="cursor:pointer;position:relative" onclick="showSpaceView('${s.id}')">
+    <div class="recent-card space-card" style="cursor:pointer;position:relative" onclick="showSpaceView('${s.id}')">
       <button class="cat-list-del" style="opacity:0" onclick="event.stopPropagation();deleteSpace('${s.id}')" title="Supprimer l'espace">✕</button>
       <div style="font-size:24px;margin-bottom:8px">${s.icon}</div>
       <div class="recent-name">${escHtml(s.name)}</div>

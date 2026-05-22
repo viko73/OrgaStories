@@ -126,7 +126,7 @@
 }
 
 .note-line-numbers span.active-line {
-  color: var(--cyan);
+  color: var(--yellow);
 }
 
 .note-body {
@@ -140,8 +140,7 @@
   font-size: 15px;
   line-height: 1.8;
   color: #e8f4f6;
-  caret-color: var(--cyan);
-  resize: none;
+  caret-color: var(--yellow);
   overflow-y: hidden;
   overflow-x: hidden;
   white-space: pre-wrap;

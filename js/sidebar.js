@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   ATELIER — Sidebar
+   ORGASTORIES — Sidebar
    Contient : renderSidebar
 ═══════════════════════════════════════════════ */
 
@@ -8,7 +8,7 @@ function renderSidebar() {
   container.innerHTML = '';
 
   const cfg = {
-    note:      { icon: '📝', color: 'var(--cyan)',   label: 'Notes' },
+    note:      { icon: '📝', color: 'var(--yellow)', label: 'Notes' },
     character: { icon: '👤', color: 'var(--purple)', label: 'Personnages' },
     world:     { icon: '🌍', color: 'var(--green)',  label: 'Mondes' },
   };

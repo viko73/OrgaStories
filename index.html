@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/modals.css">
 <link rel="stylesheet" href="css/auth.css">
-<link rel="icon" type="image/svg+xml" href="https://viko73.github.io/OrgaStories/images/orgabook.png">
 </head>
 <body>
 
@@ -73,18 +72,22 @@
         <h1 class="home-title">Donne vie à tes <em>idées</em></h1>
         <p class="home-sub">Crée des espaces, puis peuple-les de notes, personnages et mondes selon tes projets.</p>
       </div>
-      <div class="home-stats">
+      <div class="home-stats" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card">
-          <div class="stat-num" id="stat-spaces">0</div>
+          <div class="stat-num" id="stat-spaces" style="color:var(--cyan)">0</div>
           <div class="stat-label">Espaces</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num" id="stat-notes" style="color:var(--cyan)">0</div>
+          <div class="stat-num" id="stat-notes" style="color:var(--yellow)">0</div>
           <div class="stat-label">Notes</div>
         </div>
         <div class="stat-card">
           <div class="stat-num" id="stat-chars" style="color:var(--purple)">0</div>
           <div class="stat-label">Personnages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-worlds" style="color:var(--green)">0</div>
+          <div class="stat-label">Mondes</div>
         </div>
       </div>
       <div class="home-recents">

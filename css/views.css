@@ -110,7 +110,8 @@
   left: 0; top: 0; bottom: 0;
   width: 3px;
 }
-.recent-card.note::after { background: var(--cyan); }
+.recent-card.note::after { background: var(--yellow); }
+.recent-card.space-card::after { background: var(--cyan); }
 .recent-card.character::after { background: var(--purple); }
 .recent-card.world::after { background: var(--green); }
 .recent-card:hover { border-color: var(--border-bright); background: var(--bg4); }
@@ -125,7 +126,7 @@
 }
 .recent-card.character .recent-type { color: var(--purple); }
 .recent-card.world .recent-type { color: var(--green); }
-.recent-card.note .recent-type { color: var(--cyan-dim); }
+.recent-card.note .recent-type { color: var(--yellow); }
 
 .recent-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
 
@@ -212,11 +213,11 @@
 }
 .hub-tile:hover { transform: translateY(-3px); }
 
-.note-tile  { border-top: 3px solid var(--cyan); }
+.note-tile  { border-top: 3px solid var(--yellow); }
 .char-tile  { border-top: 3px solid var(--purple); }
 .world-tile { border-top: 3px solid var(--green); }
 
-.note-tile:hover  { border-color: var(--cyan); background: rgba(0,229,255,0.04); }
+.note-tile:hover  { border-color: var(--yellow); background: rgba(251,191,36,0.04); }
 .char-tile:hover  { border-color: var(--purple); background: rgba(168,85,247,0.04); }
 .world-tile:hover { border-color: var(--green); background: rgba(34,197,94,0.04); }
 
@@ -244,7 +245,7 @@
   width: fit-content;
   margin-bottom: 16px;
 }
-.note-tile  .hub-tile-count { background: rgba(0,229,255,0.1); color: var(--cyan-dim); }
+.note-tile  .hub-tile-count { background: rgba(251,191,36,0.1); color: var(--yellow); }
 .char-tile  .hub-tile-count { background: rgba(168,85,247,0.1); color: var(--purple); }
 .world-tile .hub-tile-count { background: rgba(34,197,94,0.1); color: var(--green); }
 
@@ -256,7 +257,7 @@
   transition: opacity var(--transition), transform var(--transition);
 }
 .hub-tile:hover .hub-tile-arrow { opacity: 0.7; transform: translateX(4px); }
-.note-tile:hover  .hub-tile-arrow { color: var(--cyan); }
+.note-tile:hover  .hub-tile-arrow { color: var(--yellow); }
 .char-tile:hover  .hub-tile-arrow { color: var(--purple); }
 .world-tile:hover .hub-tile-arrow { color: var(--green); }
 
@@ -292,7 +293,7 @@
   position: relative;
 }
 .cat-list-card:hover { background: var(--bg4); transform: translateY(-2px); }
-.cat-list-card.note-card:hover  { border-color: rgba(0,229,255,0.3); }
+.cat-list-card.note-card:hover  { border-color: rgba(251,191,36,0.3); }
 .cat-list-card.char-card:hover  { border-color: rgba(168,85,247,0.3); }
 .cat-list-card.world-card:hover { border-color: rgba(34,197,94,0.3); }
 
@@ -340,10 +341,10 @@
   font-family: var(--font-mono);
   font-size: 12px;
 }
-.cat-list-new.note-new  { color: rgba(0,229,255,0.4); }
+.cat-list-new.note-new  { color: rgba(251,191,36,0.4); }
 .cat-list-new.char-new  { color: rgba(168,85,247,0.4); }
 .cat-list-new.world-new { color: rgba(34,197,94,0.4); }
-.cat-list-new.note-new:hover  { background: var(--cyan-ghost); border-color: var(--cyan); color: var(--cyan); }
+.cat-list-new.note-new:hover  { background: var(--yellow-ghost); border-color: var(--yellow); color: var(--yellow); }
 .cat-list-new.char-new:hover  { background: var(--purple-ghost); border-color: var(--purple); color: var(--purple); }
 .cat-list-new.world-new:hover { background: var(--green-ghost); border-color: var(--green); color: var(--green); }
 .cat-list-new-plus { font-size: 24px; line-height: 1; }
