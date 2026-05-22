@@ -86,7 +86,6 @@ function renderRecentCards() {
 
   if (recent.length === 0) {
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
-      <div class="empty-icon">✦</div>
       <div class="empty-title">Tout commence ici</div>
       <div class="empty-sub">Crée un espace pour organiser tes notes, personnages et mondes.</div>
     </div>`;
