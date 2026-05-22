@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   ATELIER — Vues principales
+   ORGASTORIES — Vues principales
    Contient : showHome, showSpaceView, showCategoryView,
               openPage, renderRecentCards, renderSpacesGrid
 ═══════════════════════════════════════════════ */
@@ -13,7 +13,7 @@ function activateView(name) {
 
 function setBreadcrumb(crumbs) {
   const el = document.getElementById('breadcrumb');
-  const parts = ['<span style="color:var(--text-faint)">Atelier</span>'];
+  const parts = ['<span style="color:var(--text-faint)">OrgaStories</span>'];
   crumbs.forEach((c, i) => {
     const isLast = i === crumbs.length - 1;
     if (c.action) {
@@ -86,6 +86,7 @@ function renderRecentCards() {
 
   if (recent.length === 0) {
     grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">✦</div>
       <div class="empty-title">Tout commence ici</div>
       <div class="empty-sub">Crée un espace pour organiser tes notes, personnages et mondes.</div>
     </div>`;
@@ -118,7 +119,14 @@ function showSpaceView(spaceId) {
   activateView('view-space');
   setBreadcrumb([{ label: space.name, action: () => showSpaceView(spaceId) }]);
 
-  document.getElementById('space-view-title').textContent = space.name;
+  const titleInput = document.getElementById('space-view-title');
+  titleInput.value = space.name;
+  titleInput.oninput = function () {
+    space.name = this.value;
+    renderSidebar();
+    renderSpacesGrid();
+    persistState();
+  };
   document.getElementById('space-view-icon').textContent  = space.icon;
 
   const total = space.pages.length;

@@ -5,18 +5,21 @@
 ═══════════════════════════════════════════════ */
 
 /* ── NOTE ── */
+const LINE_HEIGHT_PX = 15 * 1.8; // font-size × line-height = 27px
+
 function renderNoteView(page) {
   activateView('view-note');
   document.getElementById('note-title').value = page.title;
   document.getElementById('note-space-label').textContent = getSpace(state.currentSpaceId).name;
 
-  const body = document.getElementById('note-body');
+  const body     = document.getElementById('note-body');
   const lineNums = document.getElementById('note-line-numbers');
 
-  // Remplir le contenu (texte brut avec sauts de ligne)
-  body.innerText = page.content.body || '';
+  // Remplir le textarea
+  body.value = page.content.body || '';
 
-  // Numérotation initiale
+  // Ajuster la hauteur et les numéros
+  autoResize(body);
   updateLineNumbers(body, lineNums);
 
   // Titre
@@ -29,61 +32,108 @@ function renderNoteView(page) {
     ]);
   };
 
-  // Corps : mise à jour à chaque frappe
+  // Saisie
   body.oninput = function () {
-    page.content.body = this.innerText;
+    page.content.body = this.value;
+    autoResize(this);
     updateLineNumbers(this, lineNums);
     persistState();
   };
 
-  // Mise en évidence de la ligne active au clic/curseur
+  // Sync scroll entre numéros et textarea
+  body.onscroll = function () {
+    lineNums.scrollTop = this.scrollTop;
+  };
+
+  // Ligne active au clic / clavier
   body.onkeyup = body.onclick = function () {
     highlightActiveLine(this, lineNums);
   };
 }
 
-function updateLineNumbers(editor, container) {
-  const lines = editor.innerText.split('\n');
-  // Supprimer la dernière ligne vide créée par innerText
-  const count = lines[lines.length - 1] === '' ? lines.length - 1 : lines.length;
-  const total = Math.max(count, 1);
-
-  const existing = container.children.length;
-
-  // Ajouter les numéros manquants
-  for (let i = existing + 1; i <= total; i++) {
-    const span = document.createElement('span');
-    span.textContent = i;
-    container.appendChild(span);
-  }
-  // Supprimer les numéros en trop
-  while (container.children.length > total) {
-    container.removeChild(container.lastChild);
-  }
+function autoResize(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.max(textarea.scrollHeight, 400) + 'px';
 }
 
-function highlightActiveLine(editor, container) {
-  // Trouver le numéro de ligne du curseur
-  const sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return;
-  const range = sel.getRangeAt(0).cloneRange();
-  range.collapse(true);
+function updateLineNumbers(textarea, container) {
+  const total = countVisualLines(textarea);
 
-  // Compter les \n avant la position du curseur
-  const preRange = document.createRange();
-  preRange.selectNodeContents(editor);
-  preRange.setEnd(range.startContainer, range.startOffset);
-  const text = preRange.toString();
-  const lineIndex = text.split('\n').length - 1;
+  // Reconstruire seulement si le nombre change
+  if (container.children.length === total) return;
+
+  container.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  for (let i = 1; i <= total; i++) {
+    const span = document.createElement('span');
+    span.textContent = i;
+    frag.appendChild(span);
+  }
+  container.appendChild(frag);
+}
+
+function countVisualLines(textarea) {
+  // Méthode : on mesure la hauteur totale du textarea
+  // puis on divise par la hauteur d'une ligne
+  const cs         = window.getComputedStyle(textarea);
+  const lineHeight = parseFloat(cs.lineHeight);
+  const paddingTop = parseFloat(cs.paddingTop);
+  const paddingBot = parseFloat(cs.paddingBottom);
+
+  // scrollHeight = hauteur totale du contenu (sans padding vertical)
+  const contentHeight = textarea.scrollHeight - paddingTop - paddingBot;
+  return Math.max(Math.round(contentHeight / lineHeight), 1);
+}
+
+function highlightActiveLine(textarea, container) {
+  const cs         = window.getComputedStyle(textarea);
+  const lineHeight = parseFloat(cs.lineHeight);
+  const paddingTop = parseFloat(cs.paddingTop);
+
+  // Position verticale du curseur = lignes avant lui × lineHeight
+  const text   = textarea.value.substring(0, textarea.selectionStart);
+  const lineIndex = countVisualLinesForText(textarea, text) - 1;
 
   Array.from(container.children).forEach((span, i) => {
     span.classList.toggle('active-line', i === lineIndex);
   });
 }
 
+function countVisualLinesForText(textarea, text) {
+  // Crée un clone du textarea avec seulement le texte avant le curseur
+  let clone = document.getElementById('_ta_clone');
+  if (!clone) {
+    clone = document.createElement('textarea');
+    clone.id = '_ta_clone';
+    clone.style.cssText = [
+      'position:absolute', 'top:-9999px', 'left:-9999px',
+      'visibility:hidden', 'pointer-events:none',
+      'overflow:hidden'
+    ].join(';');
+    document.body.appendChild(clone);
+  }
+
+  const cs = window.getComputedStyle(textarea);
+  clone.style.width      = textarea.offsetWidth + 'px';
+  clone.style.fontFamily = cs.fontFamily;
+  clone.style.fontSize   = cs.fontSize;
+  clone.style.lineHeight = cs.lineHeight;
+  clone.style.padding    = cs.padding;
+  clone.style.whiteSpace = 'pre-wrap';
+  clone.style.wordWrap   = 'break-word';
+  clone.style.resize     = 'none';
+  clone.value = text || ' ';
+  clone.style.height = 'auto';
+
+  const lineHeight = parseFloat(cs.lineHeight);
+  const paddingTop = parseFloat(cs.paddingTop);
+  const paddingBot = parseFloat(cs.paddingBottom);
+  const contentH   = clone.scrollHeight - paddingTop - paddingBot;
+  return Math.max(Math.round(contentH / lineHeight), 1);
+}
+
 function formatDoc(cmd, val) {
-  document.getElementById('note-body').focus();
-  document.execCommand(cmd, false, val || null);
+  // Inapplicable sur textarea — boutons désactivés silencieusement
 }
 
 /* ── PERSONNAGE ── */

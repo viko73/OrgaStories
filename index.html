@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/modals.css">
 <link rel="stylesheet" href="css/auth.css">
-<link rel="icon" type="image/png" href="https://viko73.github.io/OrgaStories/images/orgabook.png">
 </head>
 <body>
 
@@ -28,7 +27,7 @@
     <div class="nav-section">
       <div class="nav-label">Navigation</div>
       <button class="nav-item active" id="nav-home" onclick="showHome()">
-       Accueil
+        <span class="nav-icon">◈</span> Accueil
       </button>
     </div>
 
@@ -104,10 +103,10 @@
     <div class="view" id="view-space">
       <div class="space-view-wrap">
         <div class="space-view-header">
-          <div style="display:flex;align-items:center;gap:16px">
+          <div style="display:flex;align-items:center;gap:16px;flex:1">
             <div class="space-big-icon" id="space-view-icon">📚</div>
-            <div>
-              <h2 class="space-view-title" id="space-view-title">Espace</h2>
+            <div style="flex:1">
+              <input class="space-title-input" id="space-view-title" placeholder="Nom de l'espace…">
               <div class="space-view-meta" id="space-view-meta"></div>
             </div>
           </div>
@@ -183,7 +182,7 @@
         </div>
         <div class="note-editor-lined">
           <div class="note-line-numbers" id="note-line-numbers"></div>
-          <div class="note-body" id="note-body" contenteditable="true" spellcheck="true"></div>
+          <textarea class="note-body" id="note-body" spellcheck="true" placeholder="Commence à écrire…"></textarea>
         </div>
       </div>
     </div>

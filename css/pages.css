@@ -98,6 +98,7 @@
   border-radius: var(--radius);
   overflow: hidden;
   min-height: 400px;
+  align-items: flex-start;
 }
 
 .note-line-numbers {
@@ -105,23 +106,22 @@
   padding: 14px 0;
   background: var(--bg2);
   border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
   user-select: none;
   flex-shrink: 0;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
 }
 
 .note-line-numbers span {
   display: block;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 15px;
   color: var(--text-faint);
   line-height: 1.8;
   padding: 0 10px;
-  height: 27px;       /* line-height 1.8 × font-size 15px */
-  display: flex;
-  align-items: center;
+  text-align: right;
   transition: color var(--transition);
 }
 
@@ -141,14 +141,18 @@
   line-height: 1.8;
   color: #e8f4f6;
   caret-color: var(--cyan);
+  resize: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
   white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  word-wrap: break-word;
+  box-sizing: border-box;
+  -webkit-appearance: none;
 }
 
-[contenteditable] {
-  color: #e8f4f6;
-}
+.note-body::placeholder { color: var(--text-faint); }
+
+
 
 
 /* ── CHARACTER SHEET ── */
