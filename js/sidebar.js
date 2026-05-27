@@ -43,7 +43,13 @@ function renderSidebar() {
 
         // Pages de la catégorie active
         if (isCurrentCat) {
-          space.pages.filter(p => p.type === type).forEach(p => {
+          const sorted = space.pages
+            .filter(p => p.type === type)
+            .sort((a, b) => {
+              if (type === 'note') return 0;
+              return a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' });
+            });
+          sorted.forEach(p => {
             const isActivePage = state.currentPageId === p.id;
             const pageEl = document.createElement('div');
             pageEl.className = 'sidebar-page-item' + (isActivePage ? ' active' : '');

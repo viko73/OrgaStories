@@ -159,7 +159,12 @@ function showCategoryView(type) {
     world:     { label: 'Mondes',      icon: '🌍', single: 'monde',      newLabel: '+ Nouveau monde',       cls: 'world' },
   };
   const c     = cfg[type];
-  const pages = space.pages.filter(p => p.type === type);
+  const pages = space.pages
+    .filter(p => p.type === type)
+    .sort((a, b) => {
+      if (type === 'note') return 0; // notes : ordre de création
+      return a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' });
+    });
 
   state.currentView     = 'category';
   state.currentCategory = type;
