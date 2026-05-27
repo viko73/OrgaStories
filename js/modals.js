@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════
-   ATELIER — Modales
+   ORGASTORIES — Modales
    Contient : openModal, closeModal, createSpace,
               createPage, openModalPageType, selectPageType
 ═══════════════════════════════════════════════ */
@@ -30,12 +30,13 @@ function createSpace() {
   persistState();
 }
 
-/* ── Modal : Nouvelle page ── */
 let _pendingSpaceId   = null;
 let _selectedPageType = 'note';
+let _pendingFolderId  = null;
 
 function openModalPage(spaceId) {
-  _pendingSpaceId   = spaceId;
+  _pendingSpaceId  = spaceId;
+  _pendingFolderId = null;
   _selectedPageType = 'note';
   document.getElementById('page-name-input').value = '';
   document.querySelectorAll('.modal-opt').forEach(o => {
@@ -46,9 +47,10 @@ function openModalPage(spaceId) {
   setTimeout(() => document.getElementById('page-name-input').focus(), 50);
 }
 
-function openModalPageType(spaceId, type) {
+function openModalPageType(spaceId, type, folderId) {
   _pendingSpaceId   = spaceId;
   _selectedPageType = type;
+  _pendingFolderId  = folderId || null;
   document.getElementById('page-name-input').value = '';
   document.querySelectorAll('.modal-opt').forEach(o => {
     o.className = o.className.replace(/selected-\w+/g, '').trim();
@@ -72,12 +74,14 @@ function createPage() {
 
   const defaultContent = {
     note:      { body: '' },
-    character: { role: '', age: '', appearance: '', motivation: '', weakness: '', backstory: '', traits: [] },
+    character: { role: '', age: '', appearance: '', personality: '', backstory: '', relations: [] },
     world:     { genre: '', description: '', geography: '', magic: '', society: '', history: '', notes: '' }
   };
 
   const id   = 'p' + Date.now();
   const page = { id, type: _selectedPageType, title: name, content: defaultContent[_selectedPageType] };
+  if (_pendingFolderId) page.folderId = _pendingFolderId;
+
   const space = getSpace(_pendingSpaceId);
   space.pages.push(page);
 
@@ -87,4 +91,30 @@ function createPage() {
   updateStats();
   renderSpacesGrid();
   persistState();
+}
+
+/* ── Modal : Nouveau dossier ── */
+let _pendingFolderSpaceId = null;
+let _pendingFolderType    = null;
+
+function openModalFolder(spaceId, type) {
+  _pendingFolderSpaceId = spaceId;
+  _pendingFolderType    = type;
+  document.getElementById('folder-name-input').value = '';
+  openModal('modal-folder');
+  setTimeout(() => document.getElementById('folder-name-input').focus(), 50);
+}
+
+function createFolder() {
+  const name = document.getElementById('folder-name-input').value.trim();
+  if (!name) { document.getElementById('folder-name-input').focus(); return; }
+
+  const space = getSpace(_pendingFolderSpaceId);
+  if (!space.folders) space.folders = [];
+  const id = 'f' + Date.now();
+  space.folders.push({ id, name, type: _pendingFolderType });
+
+  closeModal('modal-folder');
+  persistState();
+  showCategoryView(_pendingFolderType);
 }

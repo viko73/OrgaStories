@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="css/pages.css">
 <link rel="stylesheet" href="css/modals.css">
 <link rel="stylesheet" href="css/auth.css">
-<link rel="icon" type="image/svg+xml" href="https://viko73.github.io/OrgaStories/images/orgabook.png">
 </head>
 <body>
 
@@ -373,6 +372,23 @@
       </div>
       <div class="auth-error" id="reg-error"></div>
       <button class="auth-btn" onclick="register()">Créer mon compte →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL : NOUVEAU DOSSIER
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-folder">
+  <div class="modal narrow">
+    <div class="modal-title">Nouveau dossier</div>
+    <div class="modal-sub">Donne un nom à ce dossier pour organiser tes pages.</div>
+    <div class="modal-label">Nom du dossier</div>
+    <input class="modal-input" id="folder-name-input" placeholder="Ex: Protagonistes, Acte 1…"
+           onkeydown="if(event.key==='Enter') createFolder()">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-folder')">Annuler</button>
+      <button class="btn-create" onclick="createFolder()">Créer →</button>
     </div>
   </div>
 </div>

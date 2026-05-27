@@ -24,10 +24,12 @@ const examplePages = {
       content: {
         role: 'Archiviste des Cieux', age: '28 ans, née à Aethermoor',
         appearance: 'Cheveux argent, yeux violets, cicatrice à la tempe gauche',
-        motivation: 'Retrouver les archives perdues de la Bibliothèque Interdite',
-        weakness: 'Trop attachée au passé, méfiance viscérale',
+        personality: 'Déterminée et méticuleuse, Lyara cache une grande solitude derrière une façade froide. Sa curiosité insatiable la pousse parfois à prendre des risques inconsidérés.',
         backstory: 'Orpheline élevée par les archivistes, Lyara a découvert une anomalie dans les cristaux d\'éther.',
-        traits: ['Déterminée', 'Méticuleuse', 'Solitaire', 'Curieuse']
+        relations: [
+          { name: 'Kael', type: 'Rival·e', desc: 'Ancien camarade de formation, désormais au service du Conclave.' },
+          { name: 'Maître Orvyn', type: 'Mentor', desc: 'L\'archiviste en chef qui l\'a formée et lui cache des secrets.' }
+        ]
       }
     },
     {
@@ -87,7 +89,7 @@ function initModals() {
   document.getElementById('modal-space').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal('modal-space');
   });
-  document.getElementById('modal-page').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeModal('modal-page');
+  document.getElementById('modal-folder').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal('modal-folder');
   });
 }

@@ -148,80 +148,137 @@ function showSpaceView(spaceId) {
   updateTopbarDeleteBtn();
 }
 
-/* ── Vue catégorie (liste de pages) ── */
-function showCategoryView(type) {
+/* ── Vue catégorie (liste de pages + dossiers) ── */
+function showCategoryView(type, openFolderId) {
   const space = getSpace(state.currentSpaceId);
   if (!space) return;
+  if (!space.folders) space.folders = [];
 
   const cfg = {
     note:      { label: 'Notes',       icon: '📝', single: 'note',       newLabel: '+ Nouvelle note',      cls: 'note' },
     character: { label: 'Personnages', icon: '👤', single: 'personnage', newLabel: '+ Nouveau personnage',  cls: 'char' },
     world:     { label: 'Mondes',      icon: '🌍', single: 'monde',      newLabel: '+ Nouveau monde',       cls: 'world' },
   };
-  const c     = cfg[type];
-  const pages = space.pages
-    .filter(p => p.type === type)
-    .sort((a, b) => {
-      if (type === 'note') return 0; // notes : ordre de création
-      return a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' });
-    });
+  const c = cfg[type];
 
   state.currentView     = 'category';
   state.currentCategory = type;
   state.currentPageId   = null;
+  state.currentFolderId = openFolderId || null;
   activateView('view-category');
   renderSidebar();
 
-  setBreadcrumb([
-    { label: space.name, action: () => showSpaceView(state.currentSpaceId) },
-    { label: c.label }
-  ]);
-
-  document.getElementById('cat-icon').textContent  = c.icon;
-  document.getElementById('cat-title').textContent = c.label;
-  document.getElementById('cat-meta').textContent  =
-    pages.length === 0 ? `Aucun ${c.single}` : `${pages.length} ${pages.length > 1 ? c.label.toLowerCase() : c.single}`;
-
-  document.getElementById('cat-back-btn').onclick = () => showSpaceView(state.currentSpaceId);
-
-  const addBtn = document.getElementById('cat-add-btn');
-  addBtn.textContent = c.newLabel;
-  addBtn.className   = `cat-add-btn ${c.cls}-add`;
-  addBtn.onclick     = () => openModalPageType(state.currentSpaceId, type);
-
-  const previewField = { note: 'body', character: 'backstory', world: 'description' };
-  const grid = document.getElementById('cat-list-grid');
-  let html = '';
-
-  if (pages.length === 0) {
-    html = `
-      <div class="cat-empty-state">
-        <div class="cat-empty-icon">${c.icon}</div>
-        <div class="cat-empty-label">Aucun ${c.single} pour l'instant</div>
-      </div>`;
+  // Breadcrumb
+  const crumbs = [{ label: space.name, action: () => showSpaceView(state.currentSpaceId) }];
+  if (openFolderId) {
+    const folder = space.folders.find(f => f.id === openFolderId);
+    crumbs.push({ label: c.label, action: () => showCategoryView(type) });
+    crumbs.push({ label: folder ? folder.name : '…' });
   } else {
-    html = pages.map(p => {
-      const raw = (p.content[previewField[type]] || '').replace(/<[^>]+>/g, '').slice(0, 100);
-      return `
-        <div class="cat-list-card ${c.cls}-card" onclick="openPage('${space.id}','${p.id}')">
-          <button class="cat-list-del" onclick="event.stopPropagation();deletePageAndRefresh('${space.id}','${p.id}','${type}')" title="Supprimer">✕</button>
-          <div class="cat-list-card-icon">${c.icon}</div>
-          <div class="cat-list-card-title">${escHtml(p.title)}</div>
-          <div class="cat-list-card-preview">${escHtml(raw)}${raw.length === 100 ? '…' : ''}</div>
-        </div>
-      `;
-    }).join('');
+    crumbs.push({ label: c.label });
   }
+  setBreadcrumb(crumbs);
 
-  html += `
-    <div class="cat-list-new ${c.cls}-new" onclick="openModalPageType('${space.id}','${type}')">
-      <div class="cat-list-new-plus">＋</div>
-      <div>${c.newLabel.replace('+ ','')}</div>
-    </div>
-  `;
+  document.getElementById('cat-icon').textContent = c.icon;
 
-  grid.innerHTML = html;
+  const grid = document.getElementById('cat-list-grid');
+
+  if (openFolderId) {
+    // ── VUE DOSSIER : pages du dossier ──
+    const folder = space.folders.find(f => f.id === openFolderId);
+    document.getElementById('cat-title').textContent = folder ? folder.name : 'Dossier';
+
+    const pagesInFolder = space.pages
+      .filter(p => p.type === type && p.folderId === openFolderId)
+      .sort((a, b) => type === 'note' ? 0 : a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' }));
+
+    document.getElementById('cat-meta').textContent =
+      pagesInFolder.length === 0 ? `Vide` : `${pagesInFolder.length} ${pagesInFolder.length > 1 ? c.label.toLowerCase() : c.single}`;
+
+    document.getElementById('cat-back-btn').onclick = () => showCategoryView(type);
+
+    const addBtn = document.getElementById('cat-add-btn');
+    addBtn.textContent = c.newLabel;
+    addBtn.className   = `cat-add-btn ${c.cls}-add`;
+    addBtn.onclick     = () => openModalPageType(state.currentSpaceId, type, openFolderId);
+
+    const previewField = { note: 'body', character: 'backstory', world: 'description' };
+    let html = pagesInFolder.length === 0
+      ? `<div class="cat-empty-state"><div class="cat-empty-icon">${c.icon}</div><div class="cat-empty-label">Aucun ${c.single} dans ce dossier</div></div>`
+      : pagesInFolder.map(p => renderPageCard(p, space, type, c, previewField)).join('');
+
+    html += `<div class="cat-list-new ${c.cls}-new" onclick="openModalPageType('${space.id}','${type}','${openFolderId}')">
+      <div class="cat-list-new-plus">＋</div><div>${c.newLabel.replace('+ ','')}</div></div>`;
+    grid.innerHTML = html;
+
+  } else {
+    // ── VUE CATÉGORIE : dossiers + pages sans dossier ──
+    document.getElementById('cat-title').textContent = c.label;
+
+    const allPages   = space.pages.filter(p => p.type === type);
+    const rootPages  = allPages
+      .filter(p => !p.folderId)
+      .sort((a, b) => type === 'note' ? 0 : a.title.localeCompare(b.title, 'fr', { sensitivity: 'base' }));
+    const typeFolders = space.folders
+      .filter(f => f.type === type)
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }));
+
+    document.getElementById('cat-meta').textContent =
+      allPages.length === 0 ? `Aucun ${c.single}` : `${allPages.length} ${allPages.length > 1 ? c.label.toLowerCase() : c.single}`;
+
+    document.getElementById('cat-back-btn').onclick = () => showSpaceView(state.currentSpaceId);
+
+    const addBtn = document.getElementById('cat-add-btn');
+    addBtn.textContent = c.newLabel;
+    addBtn.className   = `cat-add-btn ${c.cls}-add`;
+    addBtn.onclick     = () => openModalPageType(state.currentSpaceId, type);
+
+    const previewField = { note: 'body', character: 'backstory', world: 'description' };
+    let html = '';
+
+    // Dossiers
+    html += typeFolders.map(f => {
+      const count = space.pages.filter(p => p.type === type && p.folderId === f.id).length;
+      return `
+        <div class="folder-card ${c.cls}-folder" onclick="showCategoryView('${type}','${f.id}')">
+          <button class="cat-list-del" onclick="event.stopPropagation();deleteFolder('${space.id}','${f.id}','${type}')" title="Supprimer le dossier">✕</button>
+          <div class="folder-card-icon">📁</div>
+          <div class="cat-list-card-title">${escHtml(f.name)}</div>
+          <div class="cat-list-card-preview">${count} ${count > 1 ? c.label.toLowerCase() : c.single}</div>
+        </div>`;
+    }).join('');
+
+    // Pages sans dossier
+    if (rootPages.length === 0 && typeFolders.length === 0) {
+      html += `<div class="cat-empty-state"><div class="cat-empty-icon">${c.icon}</div><div class="cat-empty-label">Aucun ${c.single} pour l'instant</div></div>`;
+    } else {
+      html += rootPages.map(p => renderPageCard(p, space, type, c, previewField)).join('');
+    }
+
+    // Boutons + nouveau et + dossier
+    html += `
+      <div class="cat-list-new ${c.cls}-new" onclick="openModalPageType('${space.id}','${type}')">
+        <div class="cat-list-new-plus">＋</div><div>${c.newLabel.replace('+ ','')}</div>
+      </div>
+      <div class="cat-list-new folder-new" onclick="openModalFolder('${space.id}','${type}')">
+        <div class="cat-list-new-plus">📁</div><div>Nouveau dossier</div>
+      </div>`;
+
+    grid.innerHTML = html;
+  }
 }
+
+function renderPageCard(p, space, type, c, previewField) {
+  const raw = (p.content[previewField[type]] || '').replace(/<[^>]+>/g, '').slice(0, 100);
+  return `
+    <div class="cat-list-card ${c.cls}-card" onclick="openPage('${space.id}','${p.id}')">
+      <button class="cat-list-del" onclick="event.stopPropagation();deletePageAndRefresh('${space.id}','${p.id}','${type}')" title="Supprimer">✕</button>
+      <div class="cat-list-card-icon">${c.icon}</div>
+      <div class="cat-list-card-title">${escHtml(p.title)}</div>
+      <div class="cat-list-card-preview">${escHtml(raw)}${raw.length === 100 ? '…' : ''}</div>
+    </div>`;
+}
+
 
 /* ── Ouverture d'une page ── */
 function openPage(spaceId, pageId) {
@@ -251,10 +308,27 @@ function deletePageAndRefresh(spaceId, pageId, type) {
   const space = getSpace(spaceId);
   if (!space) return;
   if (!confirm('Supprimer cette page ?')) return;
+  const folderId = (space.pages.find(p => p.id === pageId) || {}).folderId;
   space.pages = space.pages.filter(p => p.id !== pageId);
   renderSidebar();
   updateStats();
   renderSpacesGrid();
+  persistState();
+  showCategoryView(type, folderId || null);
+}
+
+function deleteFolder(spaceId, folderId, type) {
+  const space = getSpace(spaceId);
+  if (!space) return;
+  const folder = (space.folders || []).find(f => f.id === folderId);
+  const count  = space.pages.filter(p => p.folderId === folderId).length;
+  const msg    = count > 0
+    ? `Supprimer le dossier "${folder?.name}" et déplacer ses ${count} page(s) hors du dossier ?`
+    : `Supprimer le dossier "${folder?.name}" ?`;
+  if (!confirm(msg)) return;
+  // Retirer le folderId des pages du dossier
+  space.pages.forEach(p => { if (p.folderId === folderId) delete p.folderId; });
+  space.folders = space.folders.filter(f => f.id !== folderId);
   persistState();
   showCategoryView(type);
 }

@@ -347,7 +347,25 @@
 .cat-list-new.note-new:hover  { background: var(--yellow-ghost); border-color: var(--yellow); color: var(--yellow); }
 .cat-list-new.char-new:hover  { background: var(--purple-ghost); border-color: var(--purple); color: var(--purple); }
 .cat-list-new.world-new:hover { background: var(--green-ghost); border-color: var(--green); color: var(--green); }
+.cat-list-new.folder-new { color: var(--text-faint); border-color: var(--border); }
+.cat-list-new.folder-new:hover { background: var(--cyan-ghost); border-color: var(--border-bright); color: var(--text-dim); }
 .cat-list-new-plus { font-size: 24px; line-height: 1; }
+
+/* ── FOLDER CARDS ── */
+.folder-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+  position: relative;
+}
+.folder-card:hover { background: var(--bg4); transform: translateY(-2px); }
+.folder-card.note-folder:hover  { border-color: rgba(251,191,36,0.4); }
+.folder-card.char-folder:hover  { border-color: rgba(168,85,247,0.4); }
+.folder-card.world-folder:hover { border-color: rgba(34,197,94,0.4); }
+.folder-card-icon { font-size: 22px; margin-bottom: 10px; }
 
 .cat-empty-state {
   grid-column: 1 / -1;

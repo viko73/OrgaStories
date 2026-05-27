@@ -209,6 +209,34 @@ body {
 }
 .sidebar-page-add:hover { color: var(--cat-color, var(--cyan)); }
 
+.sidebar-folder-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-faint);
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: background var(--transition), color var(--transition);
+  user-select: none;
+}
+.sidebar-folder-item:hover { background: var(--cyan-ghost); color: var(--text-dim); }
+.sidebar-folder-item.active { color: var(--cat-color, var(--cyan)); }
+
+.sidebar-folder-chevron {
+  font-size: 9px;
+  flex-shrink: 0;
+  width: 10px;
+}
+
+.sidebar-folder-icon {
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+
 
 .sidebar-footer {
   flex-shrink: 0;
