@@ -269,13 +269,18 @@ function showCategoryView(type, openFolderId) {
 }
 
 function renderPageCard(p, space, type, c, previewField) {
-  const raw = (p.content[previewField[type]] || '').replace(/<[^>]+>/g, '').slice(0, 100);
+  const raw        = (p.content[previewField[type]] || '').replace(/<[^>]+>/g, '').slice(0, 100);
+  const folderName = p.folderId
+    ? escHtml((space.folders || []).find(f => f.id === p.folderId)?.name || '')
+    : '';
   return `
     <div class="cat-list-card ${c.cls}-card" onclick="openPage('${space.id}','${p.id}')">
       <button class="cat-list-del" onclick="event.stopPropagation();deletePageAndRefresh('${space.id}','${p.id}','${type}')" title="Supprimer">✕</button>
+      <button class="cat-list-move" onclick="event.stopPropagation();openModalMove('${space.id}','${p.id}','${type}')" title="Déplacer">↪</button>
       <div class="cat-list-card-icon">${c.icon}</div>
       <div class="cat-list-card-title">${escHtml(p.title)}</div>
       <div class="cat-list-card-preview">${escHtml(raw)}${raw.length === 100 ? '…' : ''}</div>
+      ${folderName ? `<div class="cat-list-card-folder">📁 ${folderName}</div>` : ''}
     </div>`;
 }
 

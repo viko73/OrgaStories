@@ -89,6 +89,9 @@ function initModals() {
   document.getElementById('modal-space').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal('modal-space');
   });
+  document.getElementById('modal-move').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal('modal-move');
+  });
   document.getElementById('modal-folder').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal('modal-folder');
   });

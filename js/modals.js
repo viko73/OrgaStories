@@ -93,7 +93,78 @@ function createPage() {
   persistState();
 }
 
-/* ── Modal : Nouveau dossier ── */
+/* ── Modal : Déplacer une page ── */
+let _moveSpaceId = null;
+let _movePageId  = null;
+let _moveType    = null;
+
+function openModalMove(spaceId, pageId, type) {
+  _moveSpaceId = spaceId;
+  _movePageId  = pageId;
+  _moveType    = type;
+
+  const space   = getSpace(spaceId);
+  const page    = (space?.pages || []).find(p => p.id === pageId);
+  const folders = (space?.folders || []).filter(f => f.type === type);
+
+  const cfg = {
+    note:      { label: 'cette note' },
+    character: { label: 'ce personnage' },
+    world:     { label: 'ce monde' },
+  };
+
+  const list = document.getElementById('move-folder-list');
+  list.innerHTML = '';
+
+  // Option : aucun dossier
+  const noneEl = document.createElement('div');
+  noneEl.className = 'move-folder-opt' + (!page?.folderId ? ' selected' : '');
+  noneEl.onclick = () => movePageToFolder(null);
+  noneEl.innerHTML = `<span class="move-folder-opt-icon">—</span><span>Aucun dossier</span>`;
+  list.appendChild(noneEl);
+
+  // Options : dossiers existants
+  folders
+    .sort((a, b) => a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' }))
+    .forEach(f => {
+      const el = document.createElement('div');
+      el.className = 'move-folder-opt' + (page?.folderId === f.id ? ' selected' : '');
+      el.onclick = () => movePageToFolder(f.id);
+      el.innerHTML = `<span class="move-folder-opt-icon">📁</span><span>${escHtml(f.name)}</span>`;
+      list.appendChild(el);
+    });
+
+  // Si aucun dossier existe
+  if (folders.length === 0) {
+    const emptyEl = document.createElement('div');
+    emptyEl.style.cssText = 'padding:16px;text-align:center;font-size:12px;color:var(--text-faint);font-family:var(--font-mono)';
+    emptyEl.textContent = 'Aucun dossier créé pour l\'instant';
+    list.appendChild(emptyEl);
+  }
+
+  document.getElementById('move-modal-sub').textContent =
+    `Choisir le dossier pour "${escHtml(page?.title || '')}"`;
+
+  openModal('modal-move');
+}
+
+function movePageToFolder(folderId) {
+  const space = getSpace(_moveSpaceId);
+  const page  = (space?.pages || []).find(p => p.id === _movePageId);
+  if (!page) return;
+
+  if (folderId) {
+    page.folderId = folderId;
+  } else {
+    delete page.folderId;
+  }
+
+  closeModal('modal-move');
+  persistState();
+  renderSidebar();
+  showCategoryView(_moveType, state.currentFolderId);
+}
+
 let _pendingFolderSpaceId = null;
 let _pendingFolderType    = null;
 
